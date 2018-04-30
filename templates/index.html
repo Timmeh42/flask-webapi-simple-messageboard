@@ -1,0 +1,26 @@
+{% extends "master.html" %}
+
+{% block title %}Login{% endblock %}
+
+{% block body %}
+<div id='login_form'>
+Login to your account:<br>
+<form action='{{url_for("login")}}' method='post'>
+	Username:<br>
+	<input type='text' name='username'><br>
+	Password:<br>
+	<input type='password' name='password'><br>
+	<input type='submit' value='Login'>
+</form>
+</div><br><br>
+<div id='register_form'>
+Register for an account:<br>
+<form action='{{url_for("register")}}' method='post'>
+	Username:<br>
+	<input type='text' name='username'><br>
+	Password:<br>
+	<input type='text' name='password'><br>
+	<input type='submit' value='Register'>
+</form>
+</div>
+{% endblock %}

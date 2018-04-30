@@ -1,0 +1,41 @@
+* {
+	box-sizing: border-box;
+}
+
+.message, #replyform {
+	padding: 5px;
+	margin: 5px;
+	background-color: rgba(180,127,50,0.2);
+	border-radius: 10px;
+	-webkit-transition: height 10s;
+}
+.message:hover, #replyform {
+	border-left: 3px solid red;
+	margin-left: 2px;
+}
+
+#maincol {
+	margin-left: auto;
+	margin-right: auto;
+	width: 800px;
+}
+
+#login_form, #register_form{
+	background-color: rgb(220,220,220);
+	margin: auto;
+}
+
+.pseudolink {
+	cursor: pointer;
+	text-decoration: underline;
+}
+
+.pseudolink:hover {
+	text-decoration: unset;
+}
+
+.flashmsg {
+	width: 100%;
+	background-color: red;
+	text-align: center;
+}

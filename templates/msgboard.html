@@ -1,0 +1,97 @@
+{% extends "master.html" %}
+
+{% block title %}Simple messageboard{% endblock %}
+
+{% block body %}
+Welcome to the messageboard, {{name}}! <form style='float:right;' id='logoutform' action='{{url_for("logout")}}' method='post'><a class='pseudolink' onclick='document.getElementById("logoutform").submit(); return false;'>Logout</a></form>
+<br>
+<div id='replyform'>
+<form action='{{url_for("post_reply")}}' method='post'>
+	Add your reply:<br>
+	
+	<textarea name='text' style='width:100%;height:100px;'></textarea>
+	<input id='replyidbox' type='hidden' name='replyid' value='0'><br>
+	<input type='submit' value='Reply'>
+</form>
+</div>
+{% for message in messages %}
+	<div id={{message.id}} class='message' parentid={{message.parent}}>
+		<div style='float:left;'>{{message.author}}</div><div style='float:right;'>{{message.timestamp}}</div><br><br>
+		<div class='messagetext'>
+		{{- message.text|safe -}}
+		</div>
+		{% if message.author == name %}
+		<div style='float:right;'><a class='pseudolink' onclick='delete_post({{message.id}})'>Delete</a></div>
+		<div class='editbutton' style='float:right;'><a class='pseudolink' onclick='edit_post({{message.id}})'>Edit</a>&nbsp;</div><br>
+		{% endif %}
+		<div class='formspace'></div>
+	</div>
+{% endfor %}
+<script>
+var msgs = document.getElementsByClassName('message');
+var m_ids = []
+for(var i = 0; i < msgs.length; i++){
+	m_ids.push(msgs.item(i).getAttribute('id'))
+}
+for(var i = 0; i < m_ids.length; i++){
+	var m = document.getElementById(m_ids[i])
+	var pid = m.getAttribute('parentid')
+	if(m_ids.includes(pid)){
+		document.getElementById(pid).appendChild(m)
+	}
+	m.addEventListener('click', function(e){
+		var inpbox = document.getElementById('replyidbox');
+		inpbox.value = this.getAttribute('id');
+		var frm = document.getElementById('replyform');
+		if (this == e.target || this.getElementsByClassName('messagetext')[0] == e.target){
+			var y = this.getElementsByClassName('formspace')[0];
+			y.appendChild(frm);
+		}
+	}, true);
+}
+
+function delete_post(pid) {
+	var xhttp = new XMLHttpRequest();
+	xhttp.onreadystatechange = function() {
+		if (this.readyState == 4) {
+			window.location.href = '{{url_for("msgboard")}}';
+		}
+	};
+	xhttp.open('DELETE', '{{url_for("delete_reply")}}'+'?deleteid='+pid, true);
+	xhttp.send();
+	return false;
+}
+
+function edit_post(pid) {
+
+	var m = document.getElementById(pid);
+	var medit = m.getElementsByClassName('messagetext')[0];
+	var orig_text = medit.innerHTML;
+	orig_text = orig_text.split('<br>').join('\n');
+	medit.innerHTML = "<textarea name='text' style='width:100%;height:100px;'>"+orig_text+"</textarea>";
+	tarea = medit.getElementsByTagName('textarea');
+	tarea.value = orig_text;
+	var ebutt = m.getElementsByClassName('editbutton')[0];
+	ebutt.innerHTML = "<a class='pseudolink' onclick='commit_edit("+pid+")'>Commit Edit</a>&nbsp;"
+	return false;
+}
+
+function commit_edit(pid) {
+	var xhttp = new XMLHttpRequest();
+	xhttp.onreadystatechange = function() {
+		if (this.readyState == 4) {
+			window.location.href = '{{url_for("msgboard")}}';
+		}
+	};
+	var m = document.getElementById(pid);
+	var medit = m.getElementsByClassName('messagetext')[0];
+	tarea = medit.getElementsByTagName('textarea')[0];
+	var edittext = tarea.value;
+	edittext = edittext.split('\n').join('%0A');
+	console.log(edittext);
+	xhttp.open('PUT', '{{url_for("edit_reply")}}'+'?editid='+pid+'&text='+edittext, true);
+	xhttp.send();
+	return false;
+}
+</script>
+{% endblock %}
